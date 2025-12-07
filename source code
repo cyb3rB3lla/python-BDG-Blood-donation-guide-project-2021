@@ -1,0 +1,93 @@
+import tkinter as tk
+from tkinter import messagebox
+
+# ------------------------------
+# Load hospital data (case-insensitive)
+# ------------------------------
+def load_hospitals():
+    hospitals = {}
+    try:
+        with open("hospitals.txt", "r") as f:
+            for line in f:
+                city, hospital = line.strip().split(":")
+                hospitals[city.lower()] = hospital  # store in lowercase
+    except FileNotFoundError:
+        messagebox.showerror("Error", "hospitals.txt file not found!")
+    return hospitals
+
+hospitals = load_hospitals()
+
+# ------------------------------
+# Check eligibility
+# ------------------------------
+def check_eligibility():
+    try:
+        age = int(age_entry.get())
+        weight = int(weight_entry.get())
+        city = city_entry.get().strip().lower()  # convert input to lowercase
+
+        # Eligibility rules
+        if age < 18:
+            messagebox.showinfo("Result", "You are NOT eligible (Age must be 18+).")
+            return
+        if weight < 50:
+            messagebox.showinfo("Result", "You are NOT eligible (Weight must be 50+ kg).")
+            return
+
+        # Check hospital availability
+        if city in hospitals:
+            result = (
+                "Eligible!\nNearest donation center:\n" +
+                hospitals[city]
+            )
+        else:
+            result = "Eligible, but no hospital available in this city yet."
+
+        messagebox.showinfo("Result", result)
+
+    except ValueError:
+        messagebox.showerror("Input Error", "Please enter valid numbers for age and weight!")
+
+# ------------------------------
+# GUI Setup
+# ------------------------------
+root = tk.Tk()
+root.title("Blood Donation Guide (BDG)")
+root.geometry("420x350")
+root.config(bg="#e6f2ff")
+
+# Title
+tk.Label(
+    root,
+    text="Blood Donation Guide",
+    font=("Arial", 18, "bold"),
+    bg="#e6f2ff"
+).pack(pady=10)
+
+# Age
+tk.Label(root, text="Enter Age:", bg="#e6f2ff").pack()
+age_entry = tk.Entry(root)
+age_entry.pack()
+
+# Weight
+tk.Label(root, text="Enter Weight (kg):", bg="#e6f2ff").pack()
+weight_entry = tk.Entry(root)
+weight_entry.pack()
+
+# City
+tk.Label(root, text="Enter City:", bg="#e6f2ff").pack()
+city_entry = tk.Entry(root)
+city_entry.pack()
+
+# Button
+tk.Button(
+    root,
+    text="Check Eligibility",
+    command=check_eligibility,
+    bg="red",
+    fg="white",
+    font=("Arial", 12, "bold")
+).pack(pady=15)
+
+# Run the app
+root.mainloop()
